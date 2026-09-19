@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Hospital {
+  id    String @id @default(cuid())
+  name  String
+  users Doctor[] @relation("HospitalDoctors")
+}
+
+model User {
+  id         String @id @default(cuid())
+  hospitalId String
+  clerkId    String @unique
+  email      String
+  role       Role   @default(patient)
+
+  @@index([hospitalId])
+}
+
+enum Role {
+  patient
+  doctor
+  admin
+}
+
+model Doctor {
+  id          String @id @default(cuid())
+  hospitalId  String
+  hospital    Hospital @relation("HospitalDoctors", fields: [hospitalId], references: [id])
+  userId      String   @unique
+  specialty   String
+  bio         String?
+  feeCents    Int      @default(0)
+  slots       Slot[]
+  appointments Appointment[]
+
+  @@index([hospitalId])
+}
+
+model Patient {
+  id         String @id @default(cuid())
+  hospitalId String
+  userId     String @unique
+  dateOfBirth DateTime?
+
+  @@index([hospitalId])
+}
+
+enum SlotStatus {
+  OPEN
+  HELD
+  BOOKED
+}
+
+model Slot {
+  id         String     @id @default(cuid())
+  hospitalId String
+  doctorId   String
+  doctor     Doctor     @relation(fields: [doctorId], references: [id])
+  startsAt   DateTime
+  endsAt     DateTime
+  status     SlotStatus @default(OPEN)
+  heldUntil  DateTime?
+
+  @@index([hospitalId, doctorId, startsAt])
+}
+
+enum AppointmentStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+}
+
+model Appointment {
+  id         String            @id @default(cuid())
+  hospitalId String
+  doctorId   String
+  doctor     Doctor            @relation(fields: [doctorId], references: [id])
+  patientId  String
+  slotId     String            @unique
+  status     AppointmentStatus @default(pending)
+  reason     String?
+  createdAt  DateTime          @default(now())
+
+  @@index([hospitalId, patientId])
+  @@index([hospitalId, doctorId])
+}
+
+model Prescription {
+  id            String       @id @default(cuid())
+  hospitalId    String
+  appointmentId String
+  doctorId      String
+  patientId     String
+  diagnosis     String
+  notes         String?
+  medications   Medication[]
+  createdAt     DateTime     @default(now())
+
+  @@index([hospitalId, patientId])
+}
+
+model Medication {
+  id             String       @id @default(cuid())
+  prescriptionId String
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+  name           String
+  dosage         String
+  frequency      String
+  duration       String
+  instructions   String?
+}
+
+model NotificationLog {
+  id         String   @id @default(cuid())
+  hospitalId String
+  channel    String
+  status     String   @default("queued")
+  createdAt  DateTime @default(now())
+
+  @@index([hospitalId])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  hospitalId String
+  actorId    String
+  action     String
+  targetId   String
+  createdAt  DateTime @default(now())
+
+  @@index([hospitalId])
+}
