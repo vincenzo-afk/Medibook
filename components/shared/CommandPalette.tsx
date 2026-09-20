@@ -64,6 +64,12 @@ export function CommandPalette({ role, doctors }: { role: Ctx['role']; doctors: 
     router.push(href)
   }
 
+  function onInputKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && results[0]) {
+      go(results[0].href)
+    }
+  }
+
   if (!open) return null
   return (
     <div
@@ -71,7 +77,7 @@ export function CommandPalette({ role, doctors }: { role: Ctx['role']; doctors: 
       onClick={() => setOpen(false)}
     >
       <div
-        className="w-full max-w-lg overflow-hidden rounded-lg border border-hairline bg-panel"
+        className="palette-panel w-full max-w-lg overflow-hidden rounded-lg border border-hairline bg-panel"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-hairline px-3">
@@ -80,6 +86,7 @@ export function CommandPalette({ role, doctors }: { role: Ctx['role']; doctors: 
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={onInputKey}
             placeholder="Search doctors, pages, actions…"
             className="h-11 w-full bg-transparent text-sm text-ink placeholder:text-muted/60 focus:outline-none"
           />
@@ -98,7 +105,7 @@ export function CommandPalette({ role, doctors }: { role: Ctx['role']; doctors: 
               className="flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-[13px] text-ink transition-colors hover:bg-canvas"
             >
               <span className="flex-1 truncate">{r.label}</span>
-              <span className="text-[11px] text-muted">{r.hint} →</span>
+              <span className="text-[11px] text-muted">{r.hint}</span>
             </button>
           ))}
         </div>

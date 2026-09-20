@@ -48,20 +48,23 @@ export default async function LandingPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4">
-        <section className="py-14 md:py-20">
-          <p className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-panel px-3 py-1 text-xs font-medium text-muted">
+        <section className="relative py-14 md:py-20">
+          <div aria-hidden className="hero-glow pointer-events-none absolute inset-x-0 -top-14 h-72" />
+          <div aria-hidden className="hero-grid pointer-events-none absolute inset-0" />
+          <div className="relative">
+          <p className="enter inline-flex items-center gap-1.5 rounded-full border border-hairline bg-panel px-3 py-1 text-xs font-medium text-muted">
             <span className="h-1.5 w-1.5 rounded-full bg-success" />
             8 specialists online · same-week availability
           </p>
-          <h1 className="mt-5 max-w-2xl text-4xl font-semibold tracking-tight text-ink md:text-5xl">
+          <h1 className="enter enter-d1 mt-5 max-w-2xl text-4xl font-semibold tracking-tight text-ink md:text-5xl">
             Book the right doctor in under a minute.
           </h1>
-          <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted">
+          <p className="enter enter-d2 mt-4 max-w-xl text-[15px] leading-relaxed text-muted">
             Search by specialty, pick a live time slot, and get instant confirmation with
             reminders. Built for night-time booking — calm dark UI, dense information, zero
             clutter.
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
+          <div className="enter enter-d3 mt-6 flex flex-wrap gap-2">
             <Link href="/patient/doctors">
               <Button size="lg">
                 Find a doctor <ArrowRight size={16} />
@@ -73,7 +76,7 @@ export default async function LandingPage() {
               </Button>
             </Link>
           </div>
-          <div className="mt-8 grid gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3">
+          <div className="enter enter-d4 mt-8 grid gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3">
             {[
               { icon: Zap, title: 'Live slots', body: 'Real availability with 10-min holds and double-booking protection.' },
               { icon: CalendarCheck2, title: 'Smart reminders', body: 'Email at booking + 24h, SMS 2h before your visit.' },
@@ -86,13 +89,14 @@ export default async function LandingPage() {
               </div>
             ))}
           </div>
+          </div>
         </section>
 
         <section className="pb-16">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold tracking-tight text-ink">Top-rated doctors</h2>
-            <Link href="/patient/doctors" className="text-[13px] font-medium text-action hover:underline">
-              View all →
+            <Link href="/patient/doctors" className="flex items-center gap-1 text-[13px] font-medium text-action hover:underline">
+              View all <ArrowRight size={13} />
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

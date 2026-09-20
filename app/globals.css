@@ -86,17 +86,21 @@ body {
   background: transparent;
   border: 1px solid #22314d;
   color: #94a3b8;
-  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease, transform 120ms ease;
 }
 .slot-open:hover {
   border-color: #2563eb;
   color: #f8fafc;
   background: rgba(37, 99, 235, 0.08);
 }
+.slot-open:active {
+  transform: scale(0.96);
+}
 .slot-selected {
   background: #2563eb;
   border: 1px solid #2563eb;
   color: #fff;
+  animation: pop 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .slot-booked {
   background: rgba(148, 163, 184, 0.06);
@@ -104,4 +108,97 @@ body {
   color: #475569;
   text-decoration: line-through;
   cursor: not-allowed;
+}
+
+/* Motion system — restrained, Linear-grade. One entrance, one pop, one pulse. */
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.enter {
+  animation: enter 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.enter-d1 {
+  animation-delay: 60ms;
+}
+.enter-d2 {
+  animation-delay: 120ms;
+}
+.enter-d3 {
+  animation-delay: 180ms;
+}
+.enter-d4 {
+  animation-delay: 240ms;
+}
+.enter-d5 {
+  animation-delay: 300ms;
+}
+
+.palette-panel {
+  animation: palette-in 140ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dot-live {
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+/* Landing hero texture — faint grid + single soft glow, kept barely visible. */
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(34, 49, 77, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 49, 77, 0.5) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 75%);
+}
+.hero-glow {
+  background: radial-gradient(ellipse 60% 45% at 50% -5%, rgba(37, 99, 235, 0.16), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .slot-selected,
+  .palette-panel,
+  .dot-live {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }

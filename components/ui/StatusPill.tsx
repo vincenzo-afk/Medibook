@@ -20,7 +20,12 @@ export function StatusPill({ status, className }: { status: StatusKind; classNam
         className,
       )}
     >
-      <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-current" />
+      <span
+        className={cn(
+          'mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-current',
+          (status === 'pending' || status === 'held') && 'dot-live',
+        )}
+      />
       {status}
     </span>
   )
