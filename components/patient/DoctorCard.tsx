@@ -3,9 +3,10 @@ import { Star } from 'lucide-react'
 
 import type { Doctor } from '@/lib/db/seed-data'
 import { formatCurrency } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Card, CardBody } from '@/components/ui/Card'
 
-export function DoctorCard({ doctor }: { doctor: Doctor }) {
+export function DoctorCard({ doctor, todayOpen }: { doctor: Doctor; todayOpen?: number }) {
   return (
     <Link href={`/patient/doctors/${doctor.id}`}>
       <Card className="group transition-colors duration-150 hover:border-action/60">
@@ -30,9 +31,23 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
             <span className="text-[13px] text-muted">
               Fee <span className="font-semibold text-ink">{formatCurrency(doctor.feeCents)}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
-              <span className="h-1.5 w-1.5 rounded-full bg-success" />
-              {doctor.nextAvailable}
+            <span
+              className={cn(
+                'inline-flex items-center gap-1.5 text-xs font-medium',
+                todayOpen === 0 ? 'text-muted' : 'text-success',
+              )}
+            >
+              <span
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full',
+                  todayOpen === 0 ? 'bg-muted' : 'bg-success',
+                )}
+              />
+              {todayOpen === undefined
+                ? doctor.nextAvailable
+                : todayOpen > 0
+                  ? `${todayOpen} today`
+                  : 'Join waitlist'}
             </span>
           </div>
         </CardBody>

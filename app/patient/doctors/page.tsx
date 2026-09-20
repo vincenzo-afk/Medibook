@@ -16,11 +16,11 @@ export default async function DoctorsPage({
     specialty: params.specialty,
     query: params.q,
   })
+  const counts = await getOpenSlotCounts(
+    ctx,
+    doctors.map((d) => d.id),
+  )
   if (params.today === '1') {
-    const counts = await getOpenSlotCounts(
-      ctx,
-      doctors.map((d) => d.id),
-    )
     doctors = doctors.filter((d) => (counts[d.id]?.today ?? 0) > 0)
   }
   return (
@@ -41,7 +41,7 @@ export default async function DoctorsPage({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {doctors.map((d) => (
-            <DoctorCard key={d.id} doctor={d} />
+            <DoctorCard key={d.id} doctor={d} todayOpen={counts[d.id]?.today ?? 0} />
           ))}
         </div>
       )}
