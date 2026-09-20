@@ -202,12 +202,29 @@ Doctors write prescriptions through a structured form (medication name, dosage, 
 
 ## Deployment
 
-Deploy to Vercel:
+Deploy to Vercel (hostable out of the box — `vercel.json` ships cron jobs):
 
-1. Connect the repo to Vercel.
-2. Add all environment variables in the Vercel dashboard.
-3. Set up the Clerk webhook in production pointing to `https://your-domain.com/api/webhooks/clerk`.
-4. Run `pnpm db:migrate deploy` as part of the build step (Vercel handles this automatically if you've added the script to `build`).
+1. Push to GitHub and import the repo in Vercel (Framework: Next.js, Package manager: pnpm).
+2. Add all environment variables from `.env.example` in the Vercel dashboard.
+   `CRON_SECRET` is mandatory in production — Vercel Cron sends it as the
+   `Authorization: Bearer` header automatically, and the cron routes reject
+   unsigned calls with 401.
+3. Provision Postgres (Neon recommended) and set `DATABASE_URL` + `DIRECT_URL`.
+   Run `pnpm db:migrate deploy` once against the production branch
+   (e.g. `DATABASE_URL=<prod> pnpm db:migrate deploy`), or wire it into the
+   Vercel build command. `postinstall` runs `prisma generate` automatically.
+4. Set the Clerk webhook in production to
+   `https://your-domain.com/api/webhooks/clerk`.
+
+Cron schedule (`vercel.json`):
+
+| Job | Schedule | Purpose |
+|---|---|---|
+| `/api/cron/release-holds` | every minute | release expired 10-min slot holds |
+| `/api/cron/send-reminders` | hourly | 24h email + 2h email/SMS reminders |
+
+Without keys (`DATABASE_URL`, Clerk, Resend/Twilio unset) the app runs in demo
+mode on seeded in-memory data — useful for previews.
 
 Database: Neon (serverless Postgres) is recommended for zero-downtime branching on schema changes.
 

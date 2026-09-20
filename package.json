@@ -4,9 +4,13 @@
   "private": true,
   "description": "MediBook — Hospital appointment booking system (Next.js 16, dark Linear-style UI)",
   "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
