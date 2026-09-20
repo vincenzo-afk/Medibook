@@ -8,11 +8,21 @@ import {
   type Slot,
 } from '@/lib/db/seed-data'
 
+export interface WaitlistEntry {
+  id: string
+  hospitalId: string
+  doctorId: string
+  patientId: string
+  patientName: string
+  createdAt: string
+}
+
 interface Store {
   slots: Slot[]
   appointments: Appointment[]
   prescriptions: Prescription[]
   notifications: NotificationEntry[]
+  waitlist: WaitlistEntry[]
   audit: Array<{
     id: string
     action: string
@@ -35,6 +45,7 @@ function fresh(): Store {
       medications: p.medications.map((m) => ({ ...m })),
     })),
     notifications: [],
+    waitlist: [],
     audit: [],
   }
 }

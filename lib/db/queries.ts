@@ -4,7 +4,7 @@
  * Server Components + Server Actions call these; never raw Prisma in routes.
  */
 import type { Ctx } from '@/lib/clerk/types'
-import { getStore, resetStore } from '@/lib/db/store'
+import { getStore, resetStore, type WaitlistEntry } from '@/lib/db/store'
 import {
   DOCTORS,
   PATIENTS,
@@ -277,8 +277,26 @@ export async function rescheduleAppointment(
   return { ...appointment }
 }
 
-export async function getAppointment(ctx: Ctx, id: string): Promise<Appointment> {
+export async function getNextAppointment(
+  ctx: Ctx,
+  patientId: string,
+): Promise<(Appointment & { doctor: Doctor }) | null> {
   const store = getStore()
+  await Promise.resolve()
+  const now = Date.now()
+  const next = scoped(ctx, store.appointments)
+    .filter(
+      (a) =>
+        a.patientId === patientId &&
+        (a.status === 'pending' || a.status === 'confirmed') &&
+        new Date(a.startsAt).getTime() > now,
+    )
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0]
+  if (!next) return null
+  return { ...next, doctor: DOCTORS.find((d) => d.id === next.doctorId) as Doctor }
+}
+
+export async function getAppointment(ctx: Ctx, id: string): Promise<Appointment> {  const store = getStore()
   await Promise.resolve()
   const appointment = scoped(ctx, store.appointments).find((a) => a.id === id)
   if (!appointment) throw new NotFoundError('Appointment not found')
@@ -385,6 +403,118 @@ export async function getHospitalMetrics(ctx: Ctx): Promise<HospitalMetrics> {
 
 export function getPatients(): typeof PATIENTS {
   return PATIENTS
+}
+
+// --- Waitlist ---
+
+export async function joinWaitlist(
+  ctx: Ctx,
+  input: { doctorId: string; patientId: string; patientName: string },
+): Promise<WaitlistEntry> {
+  const store = getStore()
+  await Promise.resolve()
+  const existing = scoped(ctx, store.waitlist).find(
+    (w) => w.doctorId === input.doctorId && w.patientId === input.patientId,
+  )
+  if (existing) return { ...existing }
+  const entry: WaitlistEntry = {
+    id: `wait-${Date.now()}`,
+    hospitalId: ctx.hospitalId,
+    doctorId: input.doctorId,
+    patientId: input.patientId,
+    patientName: input.patientName,
+    createdAt: new Date().toISOString(),
+  }
+  store.waitlist.push(entry)
+  logger.info('waitlist.join', { waitlistId: entry.id, actorId: ctx.userId })
+  return { ...entry }
+}
+
+export async function leaveWaitlist(ctx: Ctx, waitlistId: string): Promise<void> {
+  const store = getStore()
+  await Promise.resolve()
+  const index = store.waitlist.findIndex(
+    (w) => w.id === waitlistId && w.hospitalId === ctx.hospitalId,
+  )
+  if (index === -1) throw new NotFoundError('Waitlist entry not found')
+  const [removed] = store.waitlist.splice(index, 1)
+  logger.info('waitlist.leave', { waitlistId: removed?.id ?? waitlistId, actorId: ctx.userId })
+}
+
+export async function getWaitlistForPatient(
+  ctx: Ctx,
+  patientId: string,
+): Promise<(WaitlistEntry & { doctor: Doctor })[]> {
+  const store = getStore()
+  await Promise.resolve()
+  return scoped(ctx, store.waitlist)
+    .filter((w) => w.patientId === patientId)
+    .map((w) => ({
+      ...w,
+      doctor: DOCTORS.find((d) => d.id === w.doctorId) as Doctor,
+    }))
+}
+
+export async function getWaitlistForDoctor(ctx: Ctx, doctorId: string): Promise<WaitlistEntry[]> {
+  const store = getStore()
+  await Promise.resolve()
+  return scoped(ctx, store.waitlist).filter((w) => w.doctorId === doctorId)
+}
+
+// --- Availability ---
+
+export async function getOpenSlotCounts(
+  ctx: Ctx,
+  doctorIds: string[],
+): Promise<Record<string, { today: number; total: number }>> {
+  const store = getStore()
+  await Promise.resolve()
+  releaseExpiredHolds(store.slots)
+  const todayKey = new Date().toISOString().slice(0, 10)
+  const counts: Record<string, { today: number; total: number }> = {}
+  for (const id of doctorIds) {
+    const open = scoped(ctx, store.slots).filter(
+      (s) => s.doctorId === id && s.status === 'open',
+    )
+    counts[id] = {
+      today: open.filter((s) => s.startsAt.slice(0, 10) === todayKey).length,
+      total: open.length,
+    }
+  }
+  return counts
+}
+
+// --- Doctor earnings ---
+
+export interface DoctorEarnings {
+  visits: number
+  revenueCents: number
+  outstandingCents: number
+}
+
+export async function getDoctorEarnings(ctx: Ctx, doctorId: string): Promise<DoctorEarnings> {
+  const store = getStore()
+  await Promise.resolve()
+  const doctor = scoped(ctx, DOCTORS).find((d) => d.id === doctorId)
+  const fee = doctor?.feeCents ?? 0
+  const rows = scoped(ctx, store.appointments).filter((a) => a.doctorId === doctorId)
+  const paid = rows.filter((a) => a.status === 'confirmed' || a.status === 'completed')
+  const outstanding = rows.filter((a) => a.status === 'pending')
+  return {
+    visits: paid.length,
+    revenueCents: paid.length * fee,
+    outstandingCents: outstanding.length * fee,
+  }
+}
+
+export async function getPrescriptionByAppointment(
+  ctx: Ctx,
+  appointmentId: string,
+): Promise<Prescription | null> {
+  const store = getStore()
+  await Promise.resolve()
+  const rx = scoped(ctx, store.prescriptions).find((p) => p.appointmentId === appointmentId)
+  return rx ? { ...rx, medications: rx.medications.map((m) => ({ ...m })) } : null
 }
 
 export interface AuditEntry {
