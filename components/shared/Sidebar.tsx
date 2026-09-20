@@ -17,8 +17,7 @@ import {
 import { cn } from '@/lib/utils'
 import type { Ctx } from '@/lib/clerk/types'
 
-const NAV: Record<Ctx['role'], Array<{ href: string; label: string; icon: typeof Search }>> = {
-  patient: [
+export const NAV: Record<Ctx['role'], Array<{ href: string; label: string; icon: typeof Search }>> = {  patient: [
     { href: '/patient', label: 'Overview', icon: LayoutDashboard },
     { href: '/patient/doctors', label: 'Find doctors', icon: Search },
     { href: '/patient/appointments', label: 'Appointments', icon: CalendarDays },
