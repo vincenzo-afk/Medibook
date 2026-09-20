@@ -2,24 +2,27 @@ import Link from 'next/link'
 import { ArrowRight, CalendarDays, FileText } from 'lucide-react'
 
 import { getCtx } from '@/lib/clerk/roles'
-import { getAppointmentsForPatient, getDoctors, getPrescriptionsForPatient } from '@/lib/db/queries'
+import { getAppointmentsForPatient, getDoctors, getNextAppointment, getPrescriptionsForPatient } from '@/lib/db/queries'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { StatusPill } from '@/components/ui/StatusPill'
 import { DoctorCard } from '@/components/patient/DoctorCard'
+import { NextVisitBanner } from '@/components/patient/NextVisitBanner'
 import { formatDateTime } from '@/lib/utils'
 
 export default async function PatientOverviewPage() {
   const ctx = await getCtx()
-  const [appointments, prescriptions, doctors] = await Promise.all([
+  const [appointments, prescriptions, doctors, next] = await Promise.all([
     getAppointmentsForPatient(ctx, 'patient-1'),
     getPrescriptionsForPatient(ctx, 'patient-1'),
     getDoctors(ctx),
+    getNextAppointment(ctx, 'patient-1'),
   ])
   const upcoming = appointments.filter((a) => a.status !== 'cancelled').slice(0, 3)
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <NextVisitBanner appointment={next ?? null} />
+      <div className="enter enter-d1 grid gap-3 sm:grid-cols-3">
         {[
           { label: 'Upcoming', value: String(upcoming.length), hint: 'confirmed + pending' },
           { label: 'Prescriptions', value: String(prescriptions.length), hint: 'active records' },
@@ -27,8 +30,8 @@ export default async function PatientOverviewPage() {
         ].map((s) => (
           <Card key={s.label}>
             <CardBody>
-              <p className="text-xs font-medium text-muted uppercase">{s.label}</p>
-              <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">{s.value}</p>
+              <p className="text-xs font-medium text-muted uppercase tracking-wide">{s.label}</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-ink tabular-nums">{s.value}</p>
               <p className="text-xs text-muted">{s.hint}</p>
             </CardBody>
           </Card>

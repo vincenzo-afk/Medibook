@@ -6,6 +6,7 @@ import { getDoctor, getSlotsForDoctor } from '@/lib/db/queries'
 import { formatCurrency } from '@/lib/utils'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { BookingPanel } from '@/components/patient/BookingPanel'
+import { JoinWaitlistCard } from '@/components/patient/JoinWaitlistCard'
 
 export default async function DoctorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -17,6 +18,7 @@ export default async function DoctorDetailPage({ params }: { params: Promise<{ i
     notFound()
   }
   const slots = await getSlotsForDoctor(ctx, id)
+  const openCount = slots.filter((s) => s.status === 'open').length
   return (
     <div className="grid gap-4 lg:grid-cols-5">
       <div className="space-y-4 lg:col-span-2">
@@ -59,7 +61,8 @@ export default async function DoctorDetailPage({ params }: { params: Promise<{ i
           </CardBody>
         </Card>
       </div>
-      <div className="lg:col-span-3">
+      <div className="space-y-4 lg:col-span-3">
+        {openCount === 0 && <JoinWaitlistCard doctorId={doctor.id} doctorName={doctor.name} />}
         <BookingPanel doctor={doctor} slots={slots} />
       </div>
     </div>

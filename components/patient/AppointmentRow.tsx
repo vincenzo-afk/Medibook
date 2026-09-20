@@ -36,7 +36,12 @@ export function AppointmentRow({
         {doctor.initials}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-ink">{doctor.name}</p>
+        <Link
+          href={`/patient/appointments/${appointment.id}`}
+          className="truncate text-sm font-medium text-ink transition-colors hover:text-white"
+        >
+          {doctor.name}
+        </Link>
         <p className="truncate text-xs text-muted">
           {formatDateTime(appointment.startsAt)} · {doctor.specialty}
         </p>
