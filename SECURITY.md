@@ -50,7 +50,7 @@ Security fixes are backported to the latest `1.x` release only.
 ┌────────────────────────────────────────────────────────────┐
 │              Trusted Boundary: Vercel Runtime               │
 │                                                             │
-│  middleware.ts ─── Clerk JWT verification                   │
+│  proxy.ts ─── Clerk JWT verification                   │
 │       │                                                     │
 │       ▼                                                     │
 │  Server Component ─── getCtx() reads session claims         │
@@ -130,14 +130,14 @@ MediBook uses Clerk for passwordless authentication:
 
 - Clerk issues a JWT signed with `CLERK_SECRET_KEY`.
 - The JWT is stored in an `httpOnly`, `Secure`, `SameSite=Lax` cookie.
-- `middleware.ts` verifies the JWT on every request via Clerk's `clerkMiddleware()`.
+- `proxy.ts` verifies the JWT on every request via Clerk's `clerkMiddleware()`.
 - Session claims include `role` (`patient` | `doctor` | `admin`) and `hospitalId`.
 
 ### Authorization: Three Layers
 
 | Layer | Where | What It Checks |
 |---|---|---|
-| Route-level | `middleware.ts` | Role vs. route group: `/patient/*` requires `role=patient`, etc. |
+| Route-level | `proxy.ts` | Role vs. route group: `/patient/*` requires `role=patient`, etc. |
 | Mutation-level | Server Action | `requireRole()` call at the top of every action |
 | Data-level | `lib/db/queries.ts` | Every query includes `hospitalId: ctx.hospitalId` |
 

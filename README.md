@@ -90,7 +90,7 @@ medibook/
 │   ├── schema.prisma
 │   ├── migrations/
 │   └── seed.ts
-├── middleware.ts             # Clerk route protection
+├── proxy.ts             # Clerk route protection
 ├── .env.example
 └── next.config.ts
 ```
@@ -181,7 +181,7 @@ Clerk handles all authentication flows:
 
 The Clerk webhook at `/api/webhooks/clerk` creates a `User` row on signup and assigns a default `patient` role. Admins promote users via the admin dashboard, which calls Clerk's Backend API to attach `role:admin` or `role:doctor` metadata.
 
-`middleware.ts` enforces route protection based on Clerk session claims.
+`proxy.ts` enforces route protection based on Clerk session claims.
 
 ---
 

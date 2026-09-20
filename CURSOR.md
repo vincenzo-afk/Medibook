@@ -37,7 +37,7 @@ prisma/
   schema.prisma
   migrations/
   seed.ts
-middleware.ts       # Clerk route protection
+proxy.ts       # Clerk route protection
 next.config.ts
 ```
 
@@ -143,7 +143,7 @@ Before opening a PR for a new feature:
 - [ ] Migration created with `pnpm db:migrate` (if schema changed).
 - [ ] Server Action in `app/actions/<feature>.ts` validates input.
 - [ ] All queries go through `lib/db/queries.ts`.
-- [ ] Role guard on every protected route in `middleware.ts`.
+- [ ] Role guard on every protected route in `proxy.ts`.
 - [ ] At least one unit test for the new logic in `lib/`.
 - [ ] At least one integration test for the Server Action.
 - [ ] At least one E2E test for the user-visible flow (Playwright).

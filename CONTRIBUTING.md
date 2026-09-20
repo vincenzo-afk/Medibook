@@ -214,7 +214,7 @@ Reviewers should verify:
 - [ ] No raw `prisma.*` calls outside `lib/db/queries.ts`.
 - [ ] No `'use client'` on data-fetching pages.
 - [ ] No `console.log` — uses `lib/logger.ts`.
-- [ ] New routes registered in `middleware.ts` if protected.
+- [ ] New routes registered in `proxy.ts` if protected.
 - [ ] No new top-level dependencies without approval.
 
 ### Security

@@ -39,7 +39,7 @@ When given a feature request, scan these files **before** writing anything:
 3. `lib/clerk/roles.ts` — see how role guards work.
 4. `lib/validations/` — find the matching Zod schema or create one.
 5. `app/actions/` — find an existing Server Action to mirror.
-6. `middleware.ts` — if new protected routes are needed, register them here.
+6. `proxy.ts` — if new protected routes are needed, register them here.
 
 Almost every feature is "find a similar one and copy the pattern". Look before you invent.
 

@@ -69,7 +69,7 @@ Read these files before writing any feature code:
 | `prisma/schema.prisma` | All data models — every feature touches at least one |
 | `lib/db/queries.ts` | Authorized query layer — never bypass with raw Prisma calls in routes |
 | `lib/clerk/roles.ts` | Role checks — every Server Action calls `requireRole()` |
-| `middleware.ts` | Route-level protection — add new protected routes here |
+| `proxy.ts` | Route-level protection — add new protected routes here |
 | `lib/validations/*.ts` | Zod schemas — every mutation must validate input |
 
 **Rule:** Server Components fetch via `lib/db/queries.ts`. Server Actions validate input with Zod, then call `lib/db/queries.ts`. Route handlers (`app/api/*`) are reserved for webhooks only.

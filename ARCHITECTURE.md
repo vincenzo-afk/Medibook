@@ -35,7 +35,7 @@ MediBook is a server-first Next.js 16 application deployed on Vercel, backed by 
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Vercel Edge Network                         │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │                middleware.ts (Clerk auth)                   │  │
+│  │                proxy.ts (Clerk auth)                   │  │
 │  │  • Verifies session JWT                                     │  │
 │  │  • Redirects unauthenticated users to /sign-in             │  │
 │  │  • Blocks role mismatches (e.g., patient hitting /admin)    │  │
@@ -74,7 +74,7 @@ Every tenant is a hospital. Every row in every tenant-scoped table carries `hosp
 
 | Layer | Mechanism |
 |---|---|
-| **Route-level** | `middleware.ts` checks Clerk session claims; blocks cross-tenant access. |
+| **Route-level** | `proxy.ts` checks Clerk session claims; blocks cross-tenant access. |
 | **Query-level** | `lib/db/queries.ts` injects `hospitalId` from a context object built from the session. Never from the request body. |
 | **Migration-level** | Every new tenant-scoped model must include `hospitalId` in its schema. CI lint rule enforces this. |
 
@@ -121,7 +121,7 @@ export async function getCtx(): Promise<Ctx> {
      │
      ▼
 ┌──────────────────────────────────────────────────┐
-│  middleware.ts                                    │
+│  proxy.ts                                    │
 │  • Verifies JWT via Clerk                         │
 │  • Reads sessionClaims.role, hospitalId           │
 │  • Routes to /patient, /doctor, /admin            │
@@ -340,7 +340,7 @@ medibook/
 ├── tests/
 │   ├── integration/
 │   └── e2e/
-├── middleware.ts
+├── proxy.ts
 ├── next.config.ts
 ├── tailwind.config.ts         # (empty — v4 uses @theme in globals.css)
 ├── .env.example
@@ -408,7 +408,7 @@ GitHub Actions
 - Prisma queries use `select` to fetch only needed fields. Avoid `include` chains deeper than 2 levels.
 - Slot availability page uses ISR (`revalidate: 60`) — stale data is acceptable for up to 1 minute.
 - Prescription PDFs stream — never buffer in memory.
-- Vercel Edge runtime is used for `middleware.ts` and webhook routes. Server Components run on Node runtime (default).
+- Vercel Edge runtime is used for `proxy.ts` and webhook routes. Server Components run on Node runtime (default).
 
 ---
 
