@@ -70,7 +70,7 @@ export function SlotGrid({
               onClick={() => onSelect(slot)}
               title={disabled ? `Slot ${slot.status}` : `Book ${formatTime(slot.startsAt)}`}
               className={cn(
-                'h-9 cursor-pointer rounded-md text-[13px] font-medium',
+                'h-9 cursor-pointer rounded-md text-[13px] font-medium tabular-nums',
                 selected ? 'slot-selected' : disabled ? 'slot-booked' : 'slot-open',
               )}
             >

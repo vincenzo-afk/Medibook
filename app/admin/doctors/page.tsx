@@ -1,3 +1,5 @@
+import { Star } from 'lucide-react'
+
 import { getCtx } from '@/lib/clerk/roles'
 import { getDoctors } from '@/lib/db/queries'
 import { formatCurrency } from '@/lib/utils'
@@ -27,7 +29,10 @@ export default async function AdminDoctorsPage() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-ink">{d.name}</p>
-                  <p className="text-xs text-muted">{d.specialty} · {formatCurrency(d.feeCents)} · ★ {d.rating}</p>
+                  <p className="flex items-center gap-1 text-xs text-muted">
+                    {d.specialty} · {formatCurrency(d.feeCents)} ·
+                    <Star size={11} className="fill-pending text-pending" /> {d.rating}
+                  </p>
                 </div>
                 <Button variant="secondary" size="sm">Manage</Button>
               </div>

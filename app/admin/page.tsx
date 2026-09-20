@@ -1,4 +1,4 @@
-import { Activity, CalendarDays, Stethoscope, Wallet } from 'lucide-react'
+import { Activity, CalendarDays, Star, Stethoscope, Wallet } from 'lucide-react'
 
 import { getCtx } from '@/lib/clerk/roles'
 import { getAllAppointments, getDoctors, getHospitalMetrics } from '@/lib/db/queries'
@@ -21,14 +21,14 @@ export default async function AdminOverviewPage() {
   ]
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-4">
+      <div className="enter enter-d1 grid gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.label}>
             <CardBody>
-              <p className="flex items-center gap-1.5 text-xs font-medium text-muted uppercase">
+              <p className="flex items-center gap-1.5 text-xs font-medium text-muted uppercase tracking-wide">
                 <s.icon size={13} /> {s.label}
               </p>
-              <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">{s.value}</p>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-ink tabular-nums">{s.value}</p>
             </CardBody>
           </Card>
         ))}
@@ -73,7 +73,9 @@ export default async function AdminOverviewPage() {
                   <p className="truncate text-[13px] font-medium text-ink">{d.name}</p>
                   <p className="text-xs text-muted">{d.specialty}</p>
                 </div>
-                <span className="text-xs text-muted">★ {d.rating}</span>
+                <span className="flex items-center gap-1 text-xs text-muted">
+                  <Star size={11} className="fill-pending text-pending" /> {d.rating}
+                </span>
               </div>
             ))}
           </div>

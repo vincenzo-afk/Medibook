@@ -29,7 +29,7 @@ export function ScheduleList({ appointments }: { appointments: Appointment[] }) 
     <div>
       {appointments.map((a) => (
         <div key={a.id} className="flex items-center gap-3 border-b border-hairline px-4 py-3 last:border-0">
-          <span className="flex h-9 w-14 shrink-0 items-center justify-center rounded-md border border-hairline text-xs font-semibold text-ink">
+          <span className="flex h-9 w-14 shrink-0 items-center justify-center rounded-md border border-hairline text-xs font-semibold text-ink tabular-nums">
             {formatTime(a.startsAt)}
           </span>
           <div className="min-w-0 flex-1">
