@@ -77,6 +77,9 @@ export function CommandPalette({ role, doctors }: { role: Ctx['role']; doctors: 
       onClick={() => setOpen(false)}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search and navigate"
         className="palette-panel w-full max-w-lg overflow-hidden rounded-lg border border-hairline bg-panel"
         onClick={(e) => e.stopPropagation()}
       >
