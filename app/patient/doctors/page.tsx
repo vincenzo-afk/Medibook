@@ -1,5 +1,5 @@
 import { getCtx } from '@/lib/clerk/roles'
-import { getDoctors } from '@/lib/db/queries'
+import { getDoctors, getOpenSlotCounts } from '@/lib/db/queries'
 import { SPECIALTIES } from '@/lib/db/seed-data'
 import { Card, CardBody } from '@/components/ui/Card'
 import { DoctorCard } from '@/components/patient/DoctorCard'
@@ -8,14 +8,21 @@ import { DoctorSearch } from '@/components/patient/DoctorSearch'
 export default async function DoctorsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ specialty?: string; q?: string }>
+  searchParams: Promise<{ specialty?: string; q?: string; today?: string }>
 }) {
   const params = await searchParams
   const ctx = await getCtx()
-  const doctors = await getDoctors(ctx, {
+  let doctors = await getDoctors(ctx, {
     specialty: params.specialty,
     query: params.q,
   })
+  if (params.today === '1') {
+    const counts = await getOpenSlotCounts(
+      ctx,
+      doctors.map((d) => d.id),
+    )
+    doctors = doctors.filter((d) => (counts[d.id]?.today ?? 0) > 0)
+  }
   return (
     <div className="space-y-4">
       <div>
